@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <!--   {{# show_juggle}}  -->
     <div id="wrapper">
         <div id="logoContainer">
             <img class="logo" src="/5.png" alt="Ar logo">
@@ -22,14 +23,21 @@
             <div id="sub">De 30 bästa tiderna med över 20 poäng vinner varsitt flak Ár Performance</div>
             <div id="startGame" onclick="startGame()"></div>
         </div>
-
+        <!--         <button id="contest-start-game"
+        class="cc-button btn-primary">{{{result_before_coupon_ki_button_text}}}
+    </button> -->
         <div id="gameDiv">
             <div id="scoreBoard"></div>
-          <!--   <div id="recordBoard"></div> -->
+            <!--   <div id="recordBoard"></div> -->
         </div>
         <div id="drinkContainer">
         </div>
+        <!--         {{# show_time}}
+        <div class="counter_box" id="juggle_counter"></div>
+        {{/ show_time}}
+        <div class="cc-txt">{{{result_before_registration_almost_all_correct_text}}}</div>  -->
     </div>
+    <!--   {{/ show_juggle}}  -->
 
     <script src="/game.js"></script>
 </body>
