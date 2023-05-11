@@ -20,11 +20,11 @@ var scoreToWin = 5;
 
 var x = 100;                 // initial x position of the ball
 var y = 100;                 // initial y position of the ball
-var initialSpeedY = -10;   // initial vertical speed of the ball
-var speedY = initialSpeedY; // initial vertical speed of the ball
-var speedX = 0;             // initial horizontal speed of the ball
-var gravity = 0.4;        // acceleration due to gravity
-var damping = 0.2;        // loss of energy on bouncing
+var initialSpeedY = -10;     // initial vertical speed of the ball
+var speedY = initialSpeedY;  // initial vertical speed of the ball
+var speedX = 0;              // initial horizontal speed of the ball
+var gravity = 0.4;           // acceleration due to gravity
+var damping = 0.2;           // loss of energy on bouncing
 
 
 var ballWH = 60;
@@ -35,6 +35,13 @@ var interval;
 
 var animationSpin = null;
 var animationZoom;
+
+//variables for array and db
+var scoreArr = [];          //save score and gameDone()
+var done;
+var game_type;
+var st;
+
 
 var gameHeight = wrapper.offsetHeight + 'px';
 var gameWidth = wrapper.offsetWidth + 'px';
@@ -67,15 +74,14 @@ cctitleContainer.style.display = 'none';
 ballEl.addEventListener('click', function (event) {
     bounces += 1;
 
-    console.log(bounces)
     click = true;
     speedY = -10; // reset the vertical speed of the ball on clicking
 
-    // Modify speedX based on the horizontal position of the click relative to the ball's center
+    //speedX based on the horizontal position of the click relative to the ball's center
     var clickX = event.clientX - wrapper.offsetLeft;
     var ballCenterX = x + ballWH / 2;
     var diffX = ballCenterX - clickX;
-    speedX = diffX / 10; // You can adjust this factor to control the horizontal speed of the ball
+    speedX = diffX / 10; //horizontal speed of the ball
 
     animationSpin = ballEl.animate(
         [
@@ -83,22 +89,32 @@ ballEl.addEventListener('click', function (event) {
             { transform: 'rotate(360deg)' }
         ],
         {
-            duration: 4000, // You can set the duration to any value, as it won't affect the animation.
-            iterations: Infinity // This makes the animation repeat indefinitely.
+            duration: 4000,
+            iterations: Infinity
         }
     );
 
-/*     if (bounces > record) {
-        record = bounces;
-        if (!recordMode) {
-            bounces = bounces;
-            recordMode = true;
-        }
-    } */
+    /*     if (bounces > record) {
+            record = bounces;
+            if (!recordMode) {
+                bounces = bounces;
+                recordMode = true;
+            }
+        } */
 });
 //recordBoard.innerText = '0';
 
-function startGame() {
+function startGame(/* dataCards, 
+                      _done, 
+                      _game_type,
+                      _st, 
+                      _scoreToWin*/) {
+
+    /*      game_type = _game_type;
+            done = _done;
+            st = _st;
+            scoreToWin = _scoreToWin; */
+
     bounces = 0;
     click = false;
     scoreBoard.innerText = bouncesStart;
@@ -116,12 +132,11 @@ function startGame() {
 
 function update() {
     interval = setInterval(() => {
-        // update position based on speed and acceleration due to gravity
         x += speedX;
         y += speedY;
         speedY += gravity;
 
-        // check for collision with the bottom of the screen
+        //collision with the bottom of the screen
         if (y + ballWH > wrapper.clientHeight - ballWH) {
             y = wrapper.clientHeight - (ballWH * 2);
             speedY = -speedY * damping;
@@ -140,30 +155,26 @@ function update() {
             }
         }
 
-        // check for collision with the left or right side of the screen
+        //collision with the left or right side of the screen
         if (x < 0 || x + ballWH > wrapper.clientWidth) {
             speedX = -speedX; // reverse the horizontal speed of the ball to simulate a bounce
         }
 
-        // update the position and velocity of the ball
+        // update the ball
         ballEl.style.top = y + 'px';
         ballEl.style.left = x + 'px';
-
-        // update score board
         scoreBoard.innerText = bounces;
 
-/*         //update record number and style according to the current number of bounces
-        if (recordMode) {
-            recordBoard.classList.add("recordmode");
-        } else {
-            recordBoard.classList.remove("recordmode");
-        } */
+        /*         //update record number and style according to the current number of bounces
+                if (recordMode) {
+                    recordBoard.classList.add("recordmode");
+                } else {
+                    recordBoard.classList.remove("recordmode");
+                } */
         scoreBoard.innerText = bounces;
         //recordBoard.innerText = record;
     }, 22);
 }
-
-
 
 
 function gameLost() {
@@ -175,7 +186,7 @@ function gameLost() {
         scoreBoard.innerText = bounces;
         cctitle.innerText = 'Du fick: ' + lastBounces + ' poäng. Försök igen!';
 
-        // Rensa tidigare interval, om det finns
+        // clear interval
         clearInterval(interval);
 
         if (!click && animationSpin) {
@@ -190,8 +201,30 @@ function gameWon() {
     scoreBoard.innerText = bounces;
     cctitle.innerText = bounces;
     cctitle.innerText = 'Du fick: ' + bounces + ' poäng! Du vann!';
+    scoreArr.unshift(gameDone);
+    scoreArr.unshift(bounces);
+    //console.log(scoreArr)
 
     if (animationSpin) {
         animationSpin.pause();
     }
+    gameDone();
 }
+
+function gameDone() {
+    if (game_type == "contestJuggle") {
+        done(game_type, encodeString((Date.now() - st).toString()));
+    } else if (game_type == "couponJuggle") {
+        done("contestJuggle", encodeString((Date.now() - st).toString()));
+    }
+}
+
+var encodeString = function (val/*:String*/) {
+    var res/*:String*/ = "";
+
+    for (var i/*:Number*/ = 0; i < val.length; i++) {
+        res += String.fromCharCode((val.charCodeAt(i) + 64));
+    }
+
+    return res;
+};
