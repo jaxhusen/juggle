@@ -201,30 +201,11 @@ function gameWon() {
     scoreBoard.innerText = bounces;
     cctitle.innerText = bounces;
     cctitle.innerText = 'Du fick: ' + bounces + ' poäng! Du vann!';
-    scoreArr.unshift(gameDone);
     scoreArr.unshift(bounces);
     //console.log(scoreArr)
 
     if (animationSpin) {
         animationSpin.pause();
     }
-    gameDone();
+    bounces = 0;
 }
-
-function gameDone() {
-    if (game_type == "contestJuggle") {
-        done(game_type, encodeString((Date.now() - st).toString()));
-    } else if (game_type == "couponJuggle") {
-        done("contestJuggle", encodeString((Date.now() - st).toString()));
-    }
-}
-
-var encodeString = function (val/*:String*/) {
-    var res/*:String*/ = "";
-
-    for (var i/*:Number*/ = 0; i < val.length; i++) {
-        res += String.fromCharCode((val.charCodeAt(i) + 64));
-    }
-
-    return res;
-};
